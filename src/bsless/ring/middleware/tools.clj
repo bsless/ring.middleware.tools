@@ -1,4 +1,8 @@
-(ns bsless.ring.middleware.tools)
+(ns bsless.ring.middleware.tools
+  (:import
+   (clojure.lang IFn$OL IFn$OLO)))
+
+(set! *warn-on-reflection* true)
 
 (defn before
   "Return a new handler which calls `f` on the request before passing it to `handler`.
@@ -124,3 +128,14 @@
      ([request respond raise]
       (let [context (enter request)]
         (handler request (before respond #(leave % context)) raise))))))
+
+(defn around-long
+  "Like [[around]] but the context returned by `enter` is a primitive long."
+  ([handler ^IFn$OL enter ^IFn$OLO leave]
+   (fn
+     ([^Object request]
+      (let [context (.invokePrim enter request)]
+        (.invokePrim leave (handler request) context)))
+     ([^Object request respond raise]
+      (let [context (.invokePrim enter request)]
+        (handler request (before respond #(.invokePrim leave % context)) raise))))))
