@@ -11,16 +11,19 @@
   (clerk/show! "notebooks/about.clj")
   (clerk/serve! {:watch-paths ["notebooks"] :browse? true}))
 
-;; # Ring Middleware Tools
+;;; # Ring Middleware Tools
 
-;; Writing middlewares sucks. There, I said it.
+;;; Writing middlewares sucks. There, I said it.
 
-;; It's not fun, it's boilerplate-y, can get confusing on a good day or
-;; super confusing on a bad day and when you're trying really hard to
-;; not block anything.
+;;; It's not fun, covering both arities is boilerplate-y, it's easy to
+;;; get wrong, and hard and confusing if you want to invoke non-blocking
+;;; functions in your middlewares. Callback hell galore.
 
-;; This library isn't a silver bullet, but hopefully it can help turn
-;; something like [this](https://github.com/ring-clojure/ring/blob/master/ring-core/src/ring/middleware/head.clj):
+;;; This library isn't a silver bullet. It's aimed at the majority of use
+;;; cases, mainly to save everyone a bit of headache
+
+;;; Hopefully it can help turn something like
+;;; [this](https://github.com/ring-clojure/ring/blob/master/ring-core/src/ring/middleware/head.clj):
 
 {:nextjournal.clerk/visibility {:result :hide :code :fold}}
 
@@ -108,9 +111,14 @@
 
 ;;; Just like `before` (ha ha), intercepts the response from the handler
 
-(((fn [handler] (-> handler (mwt/after (fn [response] (update response :count inc)))))
-  (fn [request] (update request :count (partial * 2))))
- {:count 3})
+(defn wrap-with-inc-count
+  "After the handler, inc the :count in the response"
+  [handler]
+  (-> handler (mwt/after (fn [response] (update response :count inc)))))
+
+(let [handler (fn [request] (update request :count (partial * 2)))
+      wrapped (wrap-with-inc-count handler)]
+  (wrapped {:count 3}))
 
 ;;; ### Around
 
@@ -127,10 +135,14 @@
 
 (fn [handler]
   (-> handler
-      (mwt/around (fn [_] (System/currentTimeMillis))
-                  (fn [response ctx]
-                    (println (- (System/currentTimeMillis) ctx))
-                    response))))
+      (mwt/around-long
+       (fn ^long [_] (System/currentTimeMillis))
+       (fn [response ^long ctx]
+         (println (- (System/currentTimeMillis) ctx))
+         response))))
+
+;;; This one uses `around-long` to efficiently carry around a primitive
+;;; context. Why not?
 
 ;;; ### About async
 
@@ -152,6 +164,8 @@
 ;;; Then used to wrap like so:
 
 (fn [handler] (mwt/before-async handler spam-async))
+
+;;; You'll have to close-over any thread pool you want to pass around, apologies.
 
 ;;; ### Convenience
 
