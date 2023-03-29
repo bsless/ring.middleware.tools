@@ -139,3 +139,21 @@
      ([^Object request respond raise]
       (let [context (.invokePrim enter request)]
         (handler request (before respond #(.invokePrim leave % context)) raise))))))
+
+(defn around-async
+  "Returns a handler surrounded by context returned by `enter` on request
+  which returns `leave` applied to the result and context."
+  ([handler enter leave]
+   (fn
+     #_([request] ;; TODO
+      (let [context (enter request)]
+        (leave (handler request) context)))
+     ([request respond raise]
+      (enter
+       request
+       (fn [context]
+         (handler
+          request
+          (fn [response] (leave response context respond raise))
+          raise))
+       raise)))))
