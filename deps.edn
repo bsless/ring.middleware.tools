@@ -4,6 +4,10 @@
  {:dev
   {:extra-paths ["notebooks"]
    :extra-deps {io.github.nextjournal/clerk {:mvn/version "0.13.842"}}}
+  :nextjournal/clerk
+  {:exec-fn nextjournal.clerk/build!
+   :exec-args {:paths ["notebooks/about.clj"]}
+   :extra-deps {io.github.nextjournal/clerk {:mvn/version "0.13.842"}}}
   :test
   {:extra-paths ["test"]
    :extra-deps {org.clojure/test.check {:mvn/version "1.1.1"}
