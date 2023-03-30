@@ -5,7 +5,7 @@
   <artifactId>ring.middleware.tools</artifactId>
   <version>0.1.0-SNAPSHOT</version>
   <name>io.github.bsless/ring.middleware.tools</name>
-  <description>FIXME: my new library.</description>
+  <description>Tools for the boilerplate and annoying bits of putting together ring middlewares.</description>
   <url>https://github.com/bsless/ring.middleware.tools</url>
   <licenses>
     <license>
