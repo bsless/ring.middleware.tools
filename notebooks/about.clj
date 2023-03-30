@@ -156,7 +156,7 @@
   ([x] (future {:spam x}))
   ([x sk _fk]
    (.thenApplyAsync
-    (CompletableFuture/completedStage
+    (CompletableFuture/completedFuture
      {:spam x})
     (reify Function
       (apply [_ ret] (sk ret))))))
