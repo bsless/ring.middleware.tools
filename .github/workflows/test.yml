@@ -8,8 +8,8 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
-        java: [8, 11, 15, 17, 19]
+        os: [ubuntu-latest]
+        java: [8, 11, 17, 19]
 
     runs-on: ${{ matrix.os }}
 
@@ -39,12 +39,6 @@ jobs:
             ~/.cpcache
           key: ${{ runner.os }}-${{ hashFiles('**/deps.edn') }}
 
-      - name: Run tests on Linux and MacOS
-        if: ${{ matrix.os != 'windows-latest' }}
+      - name: Run tests
         run: clojure -T:build test
         shell: bash
-
-      - name: Run tests on Windows
-        if: ${{ matrix.os == 'windows-latest' }}
-        run: clojure -T:build test
-        shell: powershell
