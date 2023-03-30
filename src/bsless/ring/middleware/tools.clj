@@ -41,7 +41,7 @@
   - (fn af [x]) returns a deref-able result
   - (fn af [x on-success on-failure]) takes continuation callbacks.
   The handler is invoked in the continuation.
-  Also takes (fn comb [request result]) -> request as an optional argument."
+  Optionally takes (fn comb [request result]) -> request as an optional argument."
   ([handler af]
    (fn
      ([request]
@@ -141,19 +141,18 @@
         (handler request (before respond #(.invokePrim leave % context)) raise))))))
 
 (defn around-async
-  "Returns a handler surrounded by context returned by `enter` on request
-  which returns `leave` applied to the result and context."
+  "Like [[around]] but `enter` and `leave` are both asynchronous functions
+  that take success and fail callbacks.
+  Currently only implemented for non-blocking handlers."
   ([handler enter leave]
    (fn
      #_([request] ;; TODO
       (let [context (enter request)]
         (leave (handler request) context)))
      ([request respond raise]
-      (enter
-       request
-       (fn [context]
-         (handler
-          request
-          (fn [response] (leave response context respond raise))
-          raise))
-       raise)))))
+      (let [on-enter-success
+            (fn [context]
+              (let [on-handler-success
+                    (fn [response] (leave response context respond raise))]
+                (handler request on-handler-success raise)))]
+        (enter request on-enter-success raise))))))
