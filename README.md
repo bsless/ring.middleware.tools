@@ -53,6 +53,6 @@ See [API.md](./API.md)
 
 ## License
 
-Copyright © 2023 Bsless
+Copyright © 2023 Ben Sless
 
 Distributed under the Eclipse Public License version 1.0.
