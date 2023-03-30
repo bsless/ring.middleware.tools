@@ -9,7 +9,7 @@ Tools for the boilerplate and annoying bits of putting together ring middlewares
 ## Usage
 
 See this [brief tutorial](https://github.clerk.garden/bsless/ring.middleware.tools)
-or [tests](./test/bsless/test/bsless/ring/middleware/tools_test.clj)
+or [tests](./test/bsless/ring/middleware/tools_test.clj)
 
 ## Dependency information
 
