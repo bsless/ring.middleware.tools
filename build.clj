@@ -20,14 +20,15 @@
   opts)
 
 (defn- jar-opts [opts]
-  (assoc opts
-          :lib lib :version version
-          :jar-file (format "target/%s-%s.jar" lib version)
-          :scm {:tag (str "v" version)}
-          :basis (b/create-basis {})
-          :class-dir class-dir
-          :target "target"
-          :src-dirs ["src"]))
+  (let [version (if (:snapshot opts) snapshot version)]
+    (assoc opts
+           :lib lib :version version
+           :jar-file (format "target/%s-%s.jar" lib version)
+           :scm {:tag (str "v" version)}
+           :basis (b/create-basis {})
+           :class-dir class-dir
+           :target "target"
+           :src-dirs ["src"])))
 
 (defn ci "Run the CI pipeline of tests (and build the JAR)." [opts]
   (test opts)
